@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Golek Opo??!</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      font-size: 48px;
+      font-weight: bold;
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  golek opo??!
+</body>
+</html>
