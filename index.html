@@ -1,23 +1,340 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>Golek Opo??!</title>
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      font-family: Arial, sans-serif;
-      font-size: 48px;
-      font-weight: bold;
-      background-color: #f0f0f0;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buat Surat</title>
+
+<!-- GOOGLE FONTS -->
+<link href="https://fonts.googleapis.com/css2?
+family=Poppins:wght@500;600&
+family=Nunito:wght@400;600&
+family=Quicksand:wght@400;600&
+family=Inter:wght@400;500&
+family=Playfair+Display:wght@500;600&
+family=Source+Serif+Pro:wght@400;600&
+display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#F5EFE6;
+  --card:#FFFFFF;
+  --text:#6B5F55;
+  --accent:#D6B98C;
+}
+
+body{
+  margin:0;
+  font-family:'Nunito',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  transition:.4s;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:40px 20px 80px;
+}
+
+h1,h2{
+  text-align:center;
+  color:#5F5248;
+}
+h2{ margin:60px 0 10px; }
+
+p{ opacity:.85; }
+
+/* THEME GRID */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:16px;
+}
+.card{
+  background:var(--card);
+  padding:18px;
+  border-radius:16px;
+  text-align:center;
+  cursor:pointer;
+  border:2px solid transparent;
+  transition:.3s;
+}
+.card:hover{ transform:translateY(-4px); }
+.card.active{
+  border-color:var(--accent);
+  background:#FFF9F0;
+}
+
+/* PREVIEW */
+.preview-wrap{
+  margin-top:30px;
+  display:flex;
+  justify-content:center;
+}
+.preview-container{
+  max-width:420px;
+  width:100%;
+}
+.preview-label{
+  text-align:center;
+  font-size:.9rem;
+  opacity:.6;
+  margin-bottom:10px;
+}
+.preview{
+  padding:24px;
+  border-radius:18px;
+  background:#FFF;
+  transition:.4s;
+}
+.preview p{ white-space:pre-line; }
+
+/* MUSIC */
+.music{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.music button{
+  padding:10px 20px;
+  border-radius:30px;
+  border:1.5px solid var(--accent);
+  background:transparent;
+  cursor:pointer;
+}
+.music button.active{
+  background:var(--accent);
+  color:white;
+}
+
+/* FORM */
+.form{
+  max-width:600px;
+  margin:20px auto 0;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+input,textarea{
+  padding:14px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-family:inherit;
+}
+textarea{ min-height:140px; }
+
+/* PRICE */
+.price-box{
+  margin-top:40px;
+  text-align:center;
+  font-size:1.2rem;
+}
+.price-box span{ font-weight:600; }
+
+/* SUBMIT */
+.submit{
+  margin-top:30px;
+  text-align:center;
+}
+.submit button{
+  font-size:1.2rem;
+  padding:16px 40px;
+  border-radius:40px;
+  border:none;
+  background:var(--accent);
+  color:white;
+  cursor:pointer;
+  transition:.3s;
+}
+.submit button:hover{ transform:scale(1.05); }
+</style>
 </head>
+
 <body>
-  golek opo??!
+
+<div class="container">
+  <h1>💌 Buat Surat</h1>
+  <p style="text-align:center;">pilih tema, rasakan dulu, baru kirim</p>
+
+  <h2>1. Pilih Tema</h2>
+  <div class="grid" id="themes"></div>
+
+  <div class="preview-wrap">
+    <div class="preview-container">
+      <div class="preview-label">Surat akan terlihat seperti ini</div>
+      <div class="preview" id="preview">
+        <h3 id="pv-title">judul</h3>
+        <p id="pv-text">Isi pesan kamu</p>
+      </div>
+    </div>
+  </div>
+
+  <h2>2. Pilih Musik</h2>
+  <p style="text-align:center; font-size:.9rem; opacity:.7;">
+    Pilihan memengaruhi harga
+  </p>
+
+  <div class="music" id="music">
+    <button data-price="0">🎻 Alunan Biola (Instrumen Glue Song)</button>
+    <button data-price="3000">🎧 Musikku sendiri</button>
+    <button data-price="5000">🎶 Request</button>
+  </div>
+
+  <div class="form">
+    <input id="songTitle" placeholder="Judul lagu (jika request)" />
+  </div>
+
+  <h2>3. Isi Surat</h2>
+  <div class="form">
+    <input id="to" placeholder="Untuk siapa?" />
+    <input id="instagram" placeholder="Username Instagram" />
+    <input id="title" placeholder="Judul surat" />
+    <textarea id="message" placeholder="Isi pesan kamu"></textarea>
+  </div>
+
+  <div class="price-box">
+    Total Harga: <span id="price">Rp10.000</span>
+  </div>
+
+  <div class="submit">
+    <button onclick="sendWA()">Kirim ke WhatsApp</button>
+  </div>
+</div>
+
+<script>
+/* ================= THEME ================= */
+const themes = {
+ "🧸 Brown Bear":{
+   bg:"#EFE3D3", paper:"#FFF8EE",
+   titleFont:"'Poppins', sans-serif",
+   bodyFont:"'Nunito', sans-serif",
+   titleColor:"#4A3F35",
+   bodyColor:"#4A3F35",
+   title:"judul",
+   text:"Isi pesan kamu"
+ },
+ "🎂 Pinky Cake":{
+   bg:"#FCE4EC", paper:"#FFFFFF",
+   titleFont:"'Poppins', sans-serif",
+   bodyFont:"'Quicksand', sans-serif",
+   titleColor:"#5A2A3C",
+   bodyColor:"#5A2A3C",
+   title:"judul",
+   text:"Isi pesan kamu"
+ },
+ "🌊 Ocean Blue":{
+   bg:"#0F2A3D", paper:"#162F44",
+   titleFont:"'Playfair Display', serif",
+   bodyFont:"'Source Serif Pro', serif",
+   titleColor:"#EAD8A8",
+   bodyColor:"#F1EAD6",
+   title:"judul",
+   text:"Isi pesan kamu"
+ },
+ "🐼 Panda Milk":{
+   bg:"#F5F5F5", paper:"#FFFFFF",
+   titleFont:"'Poppins', sans-serif",
+   bodyFont:"'Quicksand', sans-serif",
+   titleColor:"#333333",
+   bodyColor:"#333333",
+   title:"judul",
+   text:"Isi pesan kamu"
+ },
+ "🍃 Matcha Mint":{
+   bg:"#E6F0EA", paper:"#F7FBF9",
+   titleFont:"'Poppins', sans-serif",
+   bodyFont:"'Inter', sans-serif",
+   titleColor:"#2F5D50",
+   bodyColor:"#2F5D50",
+   title:"judul",
+   text:"Isi pesan kamu"
+ }
+};
+
+let selectedTheme="";
+const wrap=document.getElementById("themes");
+
+Object.keys(themes).forEach(t=>{
+  const c=document.createElement("div");
+  c.className="card";
+  c.innerText=t;
+  c.onclick=()=>{
+    document.querySelectorAll(".card").forEach(x=>x.classList.remove("active"));
+    c.classList.add("active");
+    selectedTheme=t;
+
+    const d=themes[t];
+    document.body.style.background=d.bg;
+    const pv=document.getElementById("preview");
+    pv.style.background=d.paper;
+
+    const title=document.getElementById("pv-title");
+    const text=document.getElementById("pv-text");
+    title.style.fontFamily=d.titleFont;
+    text.style.fontFamily=d.bodyFont;
+    title.style.color=d.titleColor;
+    text.style.color=d.bodyColor;
+    title.innerText=d.title;
+    text.innerText=d.text;
+  };
+  wrap.appendChild(c);
+});
+
+/* ================= PRICE & MUSIC ================= */
+const BASE_PRICE=10000;
+let selectedMusic="", musicPrice=0;
+
+function updatePrice(){
+  document.getElementById("price").innerText=
+    "Rp"+(BASE_PRICE+musicPrice).toLocaleString("id-ID");
+}
+
+document.querySelectorAll("#music button").forEach(b=>{
+  b.onclick=()=>{
+    document.querySelectorAll("#music button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    selectedMusic=b.innerText;
+    musicPrice=parseInt(b.dataset.price);
+    updatePrice();
+  };
+});
+
+/* ================= SEND WA ================= */
+function sendWA(){
+  const to=document.getElementById("to").value;
+  const ig=document.getElementById("instagram").value;
+  const title=document.getElementById("title").value;
+  const msg=document.getElementById("message").value;
+  const song=document.getElementById("songTitle").value || "-";
+  const total=BASE_PRICE+musicPrice;
+
+  if(!selectedTheme||!selectedMusic||!to||!ig||!title||!msg){
+    alert("Lengkapi dulu semuanya ya ✨");
+    return;
+  }
+
+  const text=`📩 ORDER SURAT BARU
+
+Tema: ${selectedTheme}
+Musik: ${selectedMusic}
+Request Lagu: ${song}
+
+Untuk: ${to}
+Username Instagram: ${ig}
+Judul: ${title}
+
+Total Harga: Rp${total.toLocaleString("id-ID")}
+
+Isi Pesan:
+${msg}`;
+
+  window.open("https://wa.me/6285730178048?text="+encodeURIComponent(text));
+}
+
+updatePrice();
+</script>
+
 </body>
-</html>
+  </html>
